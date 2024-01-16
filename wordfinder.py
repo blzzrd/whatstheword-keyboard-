@@ -44,9 +44,9 @@ def find_words_in_common(args):
     find_c2d = WordFinder(layouts.C2D)
     find_q2d = WordFinder(layouts.Q2D)
 
-
+    print("reading words from {filepath=}")
     with open(args.filepath, "r") as wordlist:
-        wordbank = {word.lower(): 1 for word in wordlist.read().split('\n')}
+        wordbank = {word.lower(): None for word in wordlist.read().split('\n')}
         print(len(wordbank))
 
     print("iterating through wordbank")
@@ -83,10 +83,10 @@ if __name__ == '__main__':
                         prog='WhatsTheWordKeyboard?',
                         description='This program translates words between keyboard layouts.'
                         )
-    parser.add_argument('-f', '--filename',
+    parser.add_argument('-f', '--filepath',
                         default="words.txt"
                     )      # take in a file path.
-    parser.add_argument('-a', '--alphabet',
+    parser.add_argument('-a', '--alphabetical',
                         default=False, action='store_true'
     ) # if set, only consider alphabetic letters
     parser.add_argument('-w', '--write',
