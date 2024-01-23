@@ -12,17 +12,18 @@ class WordFinder():
         self.word_list: List = []
 
     def add_word_if_translatable(self, word, wordbank):
-        if (translated_word := self.translate_word(word)) and translated_word != '':
+        print(word)
+        if (translated_word := self.translate_word(word)):
+            print(translated_word)
             if (word_exists := wordbank.get(translated_word, None)):
+                print(f"{word}, {translated_word}")
                 self.add_word_pair(word, translated_word)
 
-    def translate_word(self, word: str) -> bool:
+    def translate_word(self, word: str) -> str:
         generated_chars = []
         for char in word:
-            if char in self.__translation:
-                generated_chars.append(self.__translation[char])
-            else:
-                return ''
+            tx_char = self.__translation.get(char, '') # todo: cache?
+            generated_chars.append(tx_char)
         return ''.join(generated_chars)
     
     def add_word_pair(self, original_word: str, translated_word: str) -> None:
@@ -39,14 +40,17 @@ class WordFinder():
 
 
 def find_words_in_common(args):
-    layouts = Layouts(args.alphabetic)
+    layouts = Layouts()
     find_q2c = WordFinder(layouts.Q2C)
     find_c2d = WordFinder(layouts.C2D)
     find_q2d = WordFinder(layouts.Q2D)
+    
+    print(layouts.Q2C)
+
 
     print("reading words from {filepath=}")
     with open(args.filepath, "r") as wordlist:
-        wordbank = {word.lower(): None for word in wordlist.read().split('\n')}
+        wordbank = {word.lower(): True for word in wordlist.read().split('\n')}
         print(len(wordbank))
 
     print("iterating through wordbank")
@@ -55,6 +59,9 @@ def find_words_in_common(args):
         find_c2d.add_word_if_translatable(word, wordbank)
         find_q2d.add_word_if_translatable(word, wordbank)
 
+    print(f"q2c: {len(find_q2c.word_list)}")
+    print(f"c2d: {len(find_c2d.word_list)}")
+    print(f"q2d: {len(find_q2d.word_list)}")
     """
     q2c_dict = find_q2c.make_dict()
     c2d_dict = find_c2d.make_dict()
@@ -86,9 +93,6 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--filepath',
                         default="words.txt"
                     )      # take in a file path.
-    parser.add_argument('-a', '--alphabetical',
-                        default=False, action='store_true'
-    ) # if set, only consider alphabetic letters
     parser.add_argument('-w', '--write',
                         default=False, action='store_true'
     ) # if set, write output files.
